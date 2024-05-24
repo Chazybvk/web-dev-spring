@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nodejs Server-Sent Events</title>
+    </head>
+    <body>
+        <h1>Hello SSE!</h1>
+        <h2>List of Server-sent events</h2>
+        <ul id="sse-list"></ul>
+
+        <script>
+            const subscription = new EventSource('/subscribe');
+
+                // Default events
+                subscription.addEventListener('open', () => {
+                    console.log('Connection opened')
+                });
+
+                subscription.addEventListener('error', () => {
+                    console.error("Subscription err'd")
+                });
+
+                subscription.addEventListener('chat', (event) => {
+                    const list = document.getElementById('sse-list');
+                    const listItem = document.createElement('li');
+                    listItem.innerText = event.data;
+                    list.append(listItem);
+                });
+
+                subscription.addEventListener('message', (event) => {
+                    console.log('Receive message')
+                    const list = document.getElementById('sse-list');
+                    const listItem = document.createElement('li');
+                    listItem.innerText = event.data;
+                    list.append(listItem);
+                });
+            // TODO: add subscription code here
+        </script>
+    </body>
+</html>
