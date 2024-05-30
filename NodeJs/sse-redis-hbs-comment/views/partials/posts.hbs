@@ -1,0 +1,83 @@
+<div class="posts">
+<div class="row justify-content-center">
+    {{#each posts}}
+    <div class="col-lg-7" style="margin-top: 50px;">
+        <div class="card">
+
+            <img src="{{this.image}}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Posted by {{this.author}}</h5>
+
+                {{#if this.comments}}
+                <ul class="list-group-{{this.listGroup}}" data-id="" >
+                    {{#each this.comments}}
+                    <li class="list-group-item">{{getShortComment this}}</li>
+                    {{/each}}
+                    
+                </ul>
+                <div>
+                    <input type="text" name="message" id="">
+                    <button name="send">Опубликовать</button>
+                </div>
+                {{else}}
+                <ul class="list-group">
+                    <li class="list-group-item">Be first to comment on this post</li>
+                </ul>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+</div>
+
+<script>
+
+    const subscription = new EventSource('http://localhost:3001/subscribe');
+
+    // Default events
+    subscription.addEventListener('open', () => {
+        console.log('Connection opened')
+    });
+
+    subscription.addEventListener('error', () => {
+        console.error("Subscription err'd")
+    });
+
+    subscription.addEventListener('message', (event) => {
+        console.log('Receive message', event.data)
+        const json = JSON.parse(event.data)
+        appendItem(json.message)
+
+    });
+
+
+
+   const btn =  document.querySelector("button[name='send']")
+   const appendItem = (value) => {
+     
+        let lst = document.querySelector(".list-group-1")
+        let li = document.createElement('li')
+        li.classList = "list-group-item"
+        li.innerText = value
+        lst.appendChild(li)
+
+   }
+   
+   btn.addEventListener("click", async () => {
+        let elm = document.querySelector("input[name='message']")
+        //appendItem(elm.value)
+    
+        const response = await fetch("http://localhost:3001/publish", { 
+                method: "PUT", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ receiver_id: 10 , sender_id:20, message: elm.value  } )
+        });
+        // из объекта ответа извлекаем текст ответа
+        const responseText = await response.text();
+ 
+    console.log(responseText);
+
+
+   })
+</script>
